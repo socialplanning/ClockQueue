@@ -1,4 +1,3 @@
-#
 from BTrees.IOBTree import IOBTree
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.Five import BrowserView
