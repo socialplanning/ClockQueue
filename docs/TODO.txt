@@ -2,4 +2,4 @@
  To Do
 =======
 
-- remove opencore deps
+- clean up logging 
