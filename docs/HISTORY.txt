@@ -1,0 +1,9 @@
+Changelog for ClockQueue
+
+    (name of developer listed in brackets)
+
+ClockQueue - 0.1 Unreleased
+
+    - Initial package structure.
+      [zopeskel]
+
