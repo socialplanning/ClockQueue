@@ -48,7 +48,7 @@ class ClockQueue(object):
         return (x for x in self.queue.items())
 
 def sanitize(data):
-    if isinstance(data, list):
+    if isinstance(data, list) or isinstance(data, tuple):
         data = [sanitize(datum) for datum in data]
         return tuple(data)
     if isinstance(data, dict):
@@ -73,6 +73,8 @@ def sane_hash(data):
     -326468521
     >>> clockqueue.sane_hash(dict(mom=[dict(joe=1), set()], joe=set()))
     -2047399017
+
+    >>> clockqueue.sane_hash(({}, [], set))
     """
     return hash(sanitize(data))
     
@@ -122,9 +124,9 @@ class Job(object):
     __call__ = do_job
         
     @classmethod
-    def from_func(cls, func, **kwargs):
+    def from_func(cls, func, *args, **kwargs):
         dottedname = func.__module__ + '.' + func.__name__
-        return cls(dottedname, **kwargs)
+        return cls(dottedname, *args, **kwargs)
 
     @property
     def __dottedname__(self):
