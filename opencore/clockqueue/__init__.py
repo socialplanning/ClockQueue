@@ -1,8 +1,6 @@
-#
 from Products.CMFCore.interfaces import ISiteRoot
 from opencore.interfaces.adding import IAddProject
 from topp.clockqueue import ClockQueue
-from opencore.interfaces.adding import IAddProject
 from zope.component import adapts
 
 
