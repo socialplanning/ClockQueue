@@ -7,3 +7,4 @@ ClockQueue - 0.1 Unreleased
     - Initial package structure.
       [zopeskel]
 
+    - Initial copying of code from sputnik
