@@ -1,0 +1,67 @@
+=============
+ Clock Queue
+=============
+
+Sometimes, you know what needs to happen, but dead chicken and
+scrambled eggs must be avoided.
+
+Clock queue provides a method for store jobs till the chickens are out
+of your hair. It has two parts, the ClockQueue, a list of jobs and
+arguments to execute, and the QueueMaster, a view that executes these
+jobs at ClockServers behest.
+
+To set up triggering the view for a queue on 'projects', you would add
+the following to your zope.conf::
+
+  %import Products.ClockServer
+  <clock-server>
+    method /openplans/projects/empty_queue
+    period 30
+    user admin
+    password admin
+    host localhost
+  </clock-server>
+
+This would be for a queue on the 'projects' folder common to opencore
+installations. It's registered as an adapter, but we can excercise it
+directly::
+
+    >>> from sputnik import clockqueue
+    >>> proj = self.portal.projects
+    >>> q = clockqueue.ProjectClockQueue(proj)
+    >>> q.add_job(tests.hello_world, howdy=True)
+    >>> [x for x in clockqueue.ProjectClockQueue(proj)]
+    [('sputnik.tests.hello_world', <sputnik.clockqueue.Job object at 0x6c706d0>)]
+
+    >>> from sputnik import clockqueue
+    >>> queue = clockqueue.IClockQueue(self.portal)
+
+
+
+
+
+The queue master doesn't do anything but empty out the jobs::
+
+    >>> view = clockqueue.QueueMaster(proj, proj.REQUEST)
+    >>> view.empty_queue()
+    
+Clockserver uses a simulated HTTP request to fire the queue
+emptying. We'll do the full life cycle here as if we were Clockserver::
+
+    >>> queue = clockqueue.IClockQueue(proj)
+    >>> queue.add_job(tests.hello_world, howdy=True)
+    >>> queue.add_job(tests.hello_world, howdy=True)
+    >>> queue.add_job(tests.hello_world)
+    >>> queue.add_job(tests.hello_world, howdy=False)
+
+    >>> [x for x in queue]
+    []
+
+    >>> http("GET /projects/empty_queue HTTP 1.0")
+
+
+The queue should be emtpy now too::
+
+    >>> queue = clockqueue.IClockQueue(proj)
+    >>> [x for x in queue]
+    []
