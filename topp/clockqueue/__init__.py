@@ -1,24 +1,24 @@
 from BTrees.IOBTree import IOBTree
-from Products.CMFCore.interfaces import ISiteRoot
 from Products.Five import BrowserView
 from StringIO import StringIO
 from interfaces import IClockQueue
-from opencore.interfaces.adding import IAddProject
-from zope.component import adapts
 from zope.dottedname.resolve import resolve
 from zope.interface import implements
 import logging
 import time
+
 try:
     from zope.annotation import IAnnotations
 except ImportError:
     from zope.app.annotation import IAnnotations
 
+log = logging.getLogger('topp.clockqueue')
 
-class RootClockQueue(object):
+
+class ClockQueue(object):
     key = 'opencore.jobqueue'
     implements(IClockQueue)
-    adapts(ISiteRoot)
+    
 
     def __init__(self, context):
         self.context = context
@@ -46,12 +46,6 @@ class RootClockQueue(object):
     def __iter__(self):
         return (x for x in self.queue.items())
 
-
-class ProjectClockQueue(RootClockQueue):
-    adapts(IAddProject)
-
-
-log = logging.getLogger('sputnik.clockqueue')
 
 class QueueMaster(BrowserView):
     def __init__(self, context, request):
@@ -98,5 +92,9 @@ class Job(object):
         dottedname = func.__module__ + '.' + func.__name__
         return cls(dottedname, **kwargs)
 
+    @property
+    def __dottedname__(self):
+        return self.__module__ + '.' + self.__class__.__name__
+    
     def __repr__(self):
-        return "<%s obj: %s  %s>" %(self.__class__, self.name, self.kwargs)
+        return "<%s '%s'  args:%s kw:%s>" %(self.__dottedname__, self.name, self.args, self.kwargs)

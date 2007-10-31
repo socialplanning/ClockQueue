@@ -1,0 +1,14 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    >
+
+  <browser:page
+     for="opencore.interfaces.adding.IAddProject"
+     name="empty_queue"
+     permission="five.ManageSite"
+     class="topp.clockqueue.QueueMaster"
+     attribute="empty_queue"
+     />
+  <adapter factory="opencore.clockqueue.ProjectClockQueue" />
+
+</configure>
