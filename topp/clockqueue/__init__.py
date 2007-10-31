@@ -35,7 +35,8 @@ class ClockQueue(object):
     
     def add_job(self, func, *args, **kw):
         job = Job.from_func(func, *args, **kw)
-        self.queue[hash(job)] = job
+        self.queue[job.id] = job
+        return job.id
 
     def __delitem__(self, key):
         del self.queue[key]
@@ -46,6 +47,35 @@ class ClockQueue(object):
     def __iter__(self):
         return (x for x in self.queue.items())
 
+def sanitize(data):
+    if isinstance(data, list):
+        data = [sanitize(datum) for datum in data]
+        return tuple(data)
+    if isinstance(data, dict):
+        data = [(sanitize(key), sanitize(val)) for key, val in data.items()]
+        return tuple(data)
+    if isinstance(data, set):
+        return frozenset(data)
+    return data
+
+def sane_hash(data):
+    """
+    braindead hashing::
+    
+    >>> from topp import clockqueue 
+    >>> clockqueue.sanitize(dict(mom=[dict(joe=1)], joe=set))
+    (('joe', <type 'set'>), ('mom', ((('joe', 1),),)))
+    >>> clockqueue.sane_hash(dict(mom=[dict(joe=1)], joe=set))
+    (('joe', <type 'set'>), ('mom', ((('joe', 1),),)))
+    >>> reload(clockqueue)
+    <module 'topp.clockqueue' from '/Users/whit/dev/nui2/src/ClockQueue/topp/clockqueue/__init__.py'>
+    >>> clockqueue.sane_hash(dict(mom=[dict(joe=1)], joe=set))
+    -326468521
+    >>> clockqueue.sane_hash(dict(mom=[dict(joe=1), set()], joe=set()))
+    -2047399017
+    """
+    return hash(sanitize(data))
+    
 
 class QueueMaster(BrowserView):
     def __init__(self, context, request):
@@ -80,6 +110,10 @@ class Job(object):
         self.args = args
         self.name = name
         self.start_time = time.time()
+
+    @property
+    def id(self):
+        return sane_hash((self.name, self.args, self.kwargs))
 
     def do_job(self, context, request):
         func = resolve(self.name)
