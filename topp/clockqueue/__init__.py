@@ -14,11 +14,8 @@ except ImportError:
 
 log = logging.getLogger('topp.clockqueue')
 
-
-class ClockQueue(object):
-    key = 'opencore.jobqueue'
-    implements(IClockQueue)
-    
+class AnnotationQueue(object):
+    key = None
 
     def __init__(self, context):
         self.context = context
@@ -32,11 +29,6 @@ class ClockQueue(object):
                 annotations[self.key] = IOBTree()
             self._queue = annotations[self.key]
         return self._queue
-    
-    def add_job(self, func, *args, **kw):
-        job = Job.from_func(func, *args, **kw)
-        self.queue[job.id] = job
-        return job.id
 
     def __delitem__(self, key):
         del self.queue[key]
@@ -46,6 +38,18 @@ class ClockQueue(object):
     
     def __iter__(self):
         return (x for x in self.queue.items())
+
+
+class ClockQueue(AnnotationQueue):
+    key = 'opencore.jobqueue'
+    implements(IClockQueue)
+    
+    def add_job(self, func, *args, **kw):
+        job = Job.from_func(func, *args, **kw)
+        self.queue[job.id] = job
+        return job.id
+
+
 
 def sanitize(data):
     if isinstance(data, list) or isinstance(data, tuple):
