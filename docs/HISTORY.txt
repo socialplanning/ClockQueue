@@ -2,7 +2,10 @@ Changelog for ClockQueue
 
     (name of developer listed in brackets)
 
-ClockQueue - 0.1 Unreleased
+ClockQueue - 0.1.1  released 2008-07-22
+
+    - 0.1 was never really released, but we referred to trunk checkouts
+      setup.py has said 0.1.1 for ages, so... it's 0.1.1 :)  (pw)
 
     - Initial package structure.
       [zopeskel]
