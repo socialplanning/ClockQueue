@@ -17,6 +17,7 @@ setup(name='ClockQueue',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       include_package_data=True,
       zip_safe=False,
+      namespace_packages=['topp', 'opencore'],
       install_requires=[
           # -*- Extra requirements: -*-
       ],
